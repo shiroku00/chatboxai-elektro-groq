@@ -7,7 +7,7 @@ import os
 
 app = Flask(__name__)
 
-# Client Groq
+# Client Groq (API key dari environment)
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
@@ -39,11 +39,11 @@ def index():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_message = request.json["message"]
+    user_message = request.json.get("message", "")
     messages.append({"role": "user", "content": user_message})
 
     response = client.chat.completions.create(
-        model="openai/gpt-oss-120b",  # model Groq
+        model="openai/gpt-oss-120b",  
         messages=messages,
         temperature=0.3
     )
@@ -54,4 +54,5 @@ def chat():
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))  # Render pakai PORT
+    app.run(host="0.0.0.0", port=port)
