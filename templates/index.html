@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Teknisi Elektro AI</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Markdown Renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            min-height: 100vh;
+        }
+
+        .chat-card {
+            max-width: 550px;
+            margin: auto;
+            margin-top: 40px;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #0d6efd;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d6efd;
+            font-size: 24px;
+        }
+
+        .chat-box {
+            height: 380px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+
+        .bubble-user {
+            background: #0d6efd;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px 15px 0 15px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            margin-left: auto;
+        }
+
+        .bubble-ai {
+            background: #e9ecef;
+            color: #212529;
+            padding: 12px 15px;
+            border-radius: 15px 15px 15px 0;
+            margin-bottom: 10px;
+            max-width: 80%;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* ==== Markdown Styling ==== */
+        .bubble-ai h3 {
+            color: #0d6efd;
+            margin-top: 12px;
+            font-size: 16px;
+        }
+
+        .bubble-ai ul {
+            padding-left: 18px;
+        }
+
+        .bubble-ai li {
+            margin-bottom: 4px;
+        }
+
+        .bubble-ai table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .bubble-ai th, .bubble-ai td {
+            border: 1px solid #bbb;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .chat-footer {
+            padding: 10px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card chat-card shadow-lg">
+    <!-- HEADER -->
+    <div class="chat-header">
+        <div class="logo">
+            <i class="bi bi-lightning-charge-fill"></i>
+        </div>
+        <div>
+            <h5 class="mb-0">Teknisi Elektro AI</h5>
+            <small>PLC • Panel • Motor • Instalasi</small>
+        </div>
+    </div>
+
+    <!-- CHAT AREA -->
+    <div class="chat-box" id="chatBox">
+        <div class="bubble-ai">
+            Halo 👋<br>
+            Silakan tanyakan masalah kelistrikan atau elektronika Anda.
+        </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-footer">
+        <div class="input-group">
+            <input type="text" id="userInput" class="form-control"
+                   placeholder="Contoh: Kenapa MCB sering trip?">
+            <button class="btn btn-primary" onclick="sendMessage()">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function sendMessage() {
+    const input = document.getElementById("userInput");
+    const message = input.value.trim();
+    if (!message) return;
+
+    const chatBox = document.getElementById("chatBox");
+
+    chatBox.innerHTML += `
+        <div class="bubble-user">${message}</div>
+    `;
+
+    input.value = "";
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: message})
+    })
+    .then(res => res.json())
+    .then(data => {
+        chatBox.innerHTML += `
+            <div class="bubble-ai">
+                ${marked.parse(data.reply)}
+            </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+}
+</script>
+
+</body>
+</html>
